@@ -9,24 +9,27 @@ import Foundation
 
 enum Subscribers {
     /// A requetsted number of items, sent to a publisher from a  subscriber through the subscription.
-    struct Demand: Hashable, Copyable, Codable, Equatable, Comparable, BitwiseCopyable {
+    struct Demand: Hashable, Copyable, Codable, Equatable, Comparable, BitwiseCopyable, Sendable, CustomStringConvertible {
         static func < (lhs: Subscribers.Demand, rhs: Subscribers.Demand) -> Bool {
             lhs.max ?? 0 < rhs.max ?? 0
         }
         
-        /// The number of requested values.
-        var max: Int? {
-            _max
+        var description: String {
+            let maxString = (max != nil) ? "unlimited" : "\(max!)"
+            return "Demand(\(maxString)"
         }
         
-        private var _max: Int?
+        /// The number of requested values.
+        ///
+        /// The value is nil if the demand is unlimited
+        private(set) var max: Int?
         
         private init(_ max: Int?) {
-            self._max = max
+            self.max = max
         }
         
-        static let unlimited: Self = .init(Int.max)
-        static let none: Self = .init(nil)
+        static let unlimited: Self = .init(nil)
+        static let none: Self = .init(0)
         static func max(_ value: Int) -> Self {
             if value < 0 { fatalError("value must be a positive integer") }
             return .init(value)
@@ -40,7 +43,12 @@ enum Subscribers {
     }
     
     /// A simple subscriber that requests an unlimited number of values upon subscription.
-    final class Sink<Input, Failure>: Subscriber where Failure: Error {
+    final class Sink<Input, Failure>: Subscriber, Cancellable where Failure: Error {
+        func cancel() {
+            self.subscription?.cancel()
+            self.subscription = nil
+        }
+        
         private(set) var receiveValue: (Input) -> Void
         private(set) var receiveCompletion: (Subscribers.Completion<Failure>) -> Void
         private var subscription: Subscription?
@@ -58,7 +66,8 @@ enum Subscribers {
         }
         
         func receive(subscription: any Subscription) {
-            self.subscription?.request(.unlimited)
+            self.subscription = subscription
+            subscription.request(.unlimited)
         }
         
         @discardableResult

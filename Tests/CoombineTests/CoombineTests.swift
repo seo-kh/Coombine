@@ -1,32 +1,44 @@
 import XCTest
+import os
 @testable import Coombine
 
 final class CoombineTests: XCTestCase {
-    func test_Publisher_and_subscriber() {
+    let logger = Logger(subsystem: "COOMBINE", category: "Tests")
+    
+    /// Subscribers의 demand 계산
+    func test_1() {
         // GIVEN
-        Just(5)
-            // WHEN
-            .receive(subscriber:
-                        Sink(receiveValue: { input in
-                // THEN
-                XCTAssertEqual(input, 5)
-            }, receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    print("finish")
-                }
-            })
-            )
+        let demand = Subscribers.Demand.max(5)
+        
+        // WHEN: +, -, *,
+        let expectation = XCTestExpectation(description: "Operation Expectation")
+        expectation.expectedFulfillmentCount = 3
+        let plus = demand + 5
+        if plus.max == 10 { expectation.fulfill() }
+        
+        let minus = demand - 4
+        if minus.max == 1 { expectation.fulfill() }
+        
+        let multiply = demand * 2
+        if multiply.max == 10 { expectation.fulfill() }
+        
+        // THEN
+        XCTAssertEqual(expectation.expectedFulfillmentCount, 3)
     }
     
-    func test_Publisher_and_sink_func() {
+    /// Just와 Sink를 테스트하기 위한 test code
+    func test_2() {
         // GIVEN
-        let cancellable = Just(5)
-            // WHEN
-            .sink { output in
-                XCTAssertEqual(output, 5)
-            }
+        let just = Just([1, 2, 3])
+        let sink = Subscribers.Sink<[Int], Never> { input in
+            // THEN
+            XCTAssertEqual(input[0], 1)
+        } receiveCompletion: { _ in
+            //
+        }
 
-        cancellable.cancel()
+        // WHEN
+        just
+            .receive(subscriber: sink)
     }
 }
