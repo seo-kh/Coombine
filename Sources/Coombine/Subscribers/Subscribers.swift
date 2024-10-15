@@ -9,7 +9,7 @@ import Foundation
 
 enum Subscribers {
     /// A requetsted number of items, sent to a publisher from a  subscriber through the subscription.
-    struct Demand: Hashable, Copyable, Codable, Equatable, Comparable, BitwiseCopyable, Sendable, CustomStringConvertible {
+    struct Demand: Hashable, Codable, Equatable, Comparable, Sendable, CustomStringConvertible {
         static func < (lhs: Subscribers.Demand, rhs: Subscribers.Demand) -> Bool {
             lhs.max ?? 0 < rhs.max ?? 0
         }

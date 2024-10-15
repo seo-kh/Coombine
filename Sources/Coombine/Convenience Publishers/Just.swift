@@ -12,7 +12,7 @@ import Foundation
 /// You can use a Just publisher to start a chain of publishers. A Just publisher is also useful when replacing a value with Publishers.Catch.
 ///
 /// In contrast with Results.Publisher, a Just publisher can't fail with an error. And unlike Optional.Publisher, a Just publisher always produces a value.
-struct Just<Output>: Publisher, Copyable {
+struct Just<Output>: Publisher {
     typealias Failure = Never
     
     func receive<S>(subscriber: S)

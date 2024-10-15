@@ -4,6 +4,11 @@ import os
 
 final class CoombineTests: XCTestCase {
     let logger = Logger(subsystem: "COOMBINE", category: "Tests")
+    var cancellable: Cancellable?
+    
+    override func tearDown() {
+        cancellable = nil
+    }
     
     /// Subscribers의 demand 계산
     func test_1() {
@@ -40,5 +45,19 @@ final class CoombineTests: XCTestCase {
         // WHEN
         just
             .receive(subscriber: sink)
+    }
+    
+    func test_3() {
+        // Given
+        let array = [1, 2, 3].publisher
+        // When
+        self.cancellable = array
+            .sink(receiveCompletion: { _ in
+                // Then
+                XCTAssert(true)
+            }, receiveValue: { output in
+                print(output)
+            })
+        
     }
 }

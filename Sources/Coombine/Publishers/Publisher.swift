@@ -23,4 +23,29 @@ protocol Publisher<Output, Failure> {
 
 extension Publisher {
     // TODO: func subscribe(_), func subscribe(_) -> AnyCancellable
+    func subscribe<S>(_ subscriber: S) where S: Subscriber, Self.Output == S.Input, Self.Failure == S.Failure {
+        self
+            .receive(subscriber: subscriber)
+    }
+    
+    func sink(
+        receiveCompletion: @escaping ((Subscribers.Completion<Self.Failure>) -> Void),
+        receiveValue: @escaping ((Self.Output) -> Void)
+    ) -> AnyCancellable {
+        let subscriber = Subscribers.Sink(receiveValue: receiveValue, receiveCompletion: receiveCompletion)
+        
+        self.receive(subscriber: subscriber)
+        
+        return .init(subscriber)
+    }
+    
+    func sink(
+        receiveValue: @escaping ((Self.Output) -> Void)
+    ) -> AnyCancellable where Self.Failure == Never {
+        let subscriber = Subscribers.Sink<Self.Output, Self.Failure>(receiveValue: receiveValue, receiveCompletion: { _ in })
+        
+        self.receive(subscriber: subscriber)
+        
+        return .init(subscriber)
+    }
 }
