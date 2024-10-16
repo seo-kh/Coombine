@@ -74,4 +74,8 @@ extension Publisher {
     func eraseToAnyPublisher() -> AnyPublisher<Self.Output, Self.Failure> {
         .init(self)
     }
+    
+    func map<T>(_ transform: @escaping (Self.Output) -> T) -> Publishers.Map<Self, T> {
+        .init(upstream: self, transform: transform)
+    }
 }

@@ -308,4 +308,20 @@ final class CoombineTests: XCTestCase {
             print("Successfully cast erased.publisher.")
         }
     }
+    
+    // map() test
+    func test_13() {
+        let intSubject = PassThroughSubject<Int, Never>()
+        
+        cancellable = intSubject
+            .map({ $0 < 350 })
+            .sink(receiveValue: { output in
+                print(output)
+            })
+        
+        intSubject.send(200)
+        intSubject.send(400)
+        intSubject.send(completion: .finished)
+        intSubject.send(599)
+    }
 }
