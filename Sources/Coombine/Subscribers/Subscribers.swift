@@ -75,4 +75,38 @@ enum Subscribers {
             self.receiveValue(input)
             return .unlimited
         }
-    }}
+    }
+    
+    final class Assign<Root, Input>: Subscriber, Cancellable {
+        final private(set) var object: Root?
+        final let keyPath: ReferenceWritableKeyPath<Root, Input>
+        final private var subscription: Subscription?
+
+        init(object: Root, keyPath: ReferenceWritableKeyPath<Root, Input>) {
+            self.object = object
+            self.keyPath = keyPath
+        }
+        
+        func cancel() {
+            self.subscription?.cancel()
+            self.subscription = nil
+            self.object = nil
+        }
+        
+        func receive(completion: Subscribers.Completion<Never>) {
+            self.object = nil
+            self.subscription = nil
+        }
+        
+        func receive(subscription: any Subscription) {
+            self.subscription = subscription
+        }
+        
+        func receive(_ input: Input) -> Subscribers.Demand {
+            object?[keyPath: keyPath] = input
+            return .unlimited
+        }
+        
+        typealias Failure = Never
+    }
+}

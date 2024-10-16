@@ -58,4 +58,16 @@ extension Publisher {
         
         return .init(subscriber)
     }
+    
+    func assign<Root>(
+        to keyPath: ReferenceWritableKeyPath<Root, Self.Output>,
+        on object: Root
+    ) -> AnyCancellable where Failure == Never {
+        let subscriber = Subscribers.Assign(object: object, keyPath: keyPath)
+        
+        self
+            .receive(subscriber: subscriber)
+        
+        return .init(subscriber)
+    }
 }

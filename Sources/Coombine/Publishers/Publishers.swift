@@ -20,7 +20,7 @@ enum Publishers {
                 .receive(subscription: subscription)
             
             for element in sequence {
-                let demand = subscriber.receive(element)
+                _ = subscriber.receive(element)
             }
             
             subscriber.receive(completion: .finished)

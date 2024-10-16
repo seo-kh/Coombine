@@ -234,4 +234,55 @@ final class CoombineTests: XCTestCase {
 
         XCTAssertNotEqual(fullfillments.count, fullfillCount)
     }
+    
+    // Assign Subscriber
+    func test_10() {
+        class MyClass {
+            var anInt: Int = 0 {
+                didSet {
+                    print("anInt was set to: \(anInt)", terminator: "; ")
+                }
+            }
+        }
+        
+        var myObject = MyClass()
+        let myRange = (0...2)
+        
+        cancellable = myRange.publisher
+            .assign(to: \.anInt, on: myObject)
+    }
+    
+    // Assign Cancel, Completion
+    func test_11() {
+        class MyClass {
+            var anInt: Int = 0 {
+                didSet {
+                    print("anInt was set to: \(anInt)", terminator: "; ")
+                }
+            }
+        }
+        
+        var myObject = MyClass()
+        var intSubject = PassThroughSubject<Int, Never>()
+        
+        cancellable = intSubject
+            .assign(to: \.anInt, on: myObject)
+        
+        intSubject.send(0)
+        
+        cancellable?.cancel()
+        
+        intSubject = PassThroughSubject<Int, Never>()
+        
+        cancellable = intSubject
+            .assign(to: \.anInt, on: myObject)
+        
+        intSubject.send(1)
+        
+        intSubject.send(completion: .finished)
+        
+        intSubject.send(2)
+        
+        XCTAssertEqual(myObject.anInt, 1)
+    }
 }
