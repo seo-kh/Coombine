@@ -28,6 +28,16 @@ extension Publisher {
             .receive(subscriber: subscriber)
     }
     
+    func subscribe<S>(_ subject: S) -> AnyCancellable where S: Subject, Self.Failure == S.Failure, Self.Output == S.Output {
+        return self
+            .sink { completion in
+                subject.send(completion: completion)
+            } receiveValue: { output in
+                subject.send(output)
+            }
+
+    }
+    
     func sink(
         receiveCompletion: @escaping ((Subscribers.Completion<Self.Failure>) -> Void),
         receiveValue: @escaping ((Self.Output) -> Void)

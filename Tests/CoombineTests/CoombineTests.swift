@@ -47,6 +47,7 @@ final class CoombineTests: XCTestCase {
             .receive(subscriber: sink)
     }
     
+    // Sequence publisher와 Sink func 테스트
     func test_3() {
         // Given
         let array = [1, 2, 3].publisher
@@ -59,5 +60,178 @@ final class CoombineTests: XCTestCase {
                 print(output)
             })
         
+    }
+    
+    // CurrentValueSubject test: sink
+    func test_4() {
+        // Given
+        let integerSubject = CurrentValueSubject<Int, Never>(0)
+        // When
+        cancellable = integerSubject
+            .sink { output in
+                // Then
+                XCTAssertEqual(output, 0)
+            }
+    }
+    
+    // CurrentValueSubject test: send
+    func test_5() {
+        // Given
+        let integerSubject = CurrentValueSubject<Int, Never>(0)
+        let expectation = XCTestExpectation()
+        expectation.expectedFulfillmentCount = 3
+        
+        // When
+        cancellable = integerSubject
+            .sink { output in
+                if [0, 3, 5]
+                    .contains(output) {
+                    expectation.fulfill()
+                }
+            }
+        
+        integerSubject
+            .send(3)
+        
+        integerSubject
+            .send(5)
+    }
+    
+    // CurrentValueSubject test: completion
+    func test_6() {
+        // Given
+        let integerSubject = CurrentValueSubject<Int, Never>(0)
+        var fullfillments = Set<Int>()
+        let fullfillCount = 5
+        
+        cancellable = integerSubject
+            .sink(receiveCompletion: { completion in
+                // Then
+                XCTAssertNotEqual(fullfillments.count, fullfillCount)
+            }, receiveValue: { output in
+                fullfillments.insert(output)
+            })
+        
+        // When
+        integerSubject
+            .send(3)
+        
+        integerSubject
+            .send(5)
+        
+        integerSubject
+            .send(completion: .finished)
+    }
+    
+    // CurrentValueSubject test: completion
+    func test_7() {
+        // Given
+        let integerSubject = CurrentValueSubject<Int, Never>(0)
+        var fullfillments = Set<Int>()
+        let fullfillCount = 5
+        
+        cancellable = integerSubject
+            .sink(receiveCompletion: { completion in
+            }, receiveValue: { output in
+                fullfillments.insert(output)
+            })
+        
+        // When
+        integerSubject
+            .send(3)
+        
+        integerSubject
+            .send(5)
+        
+        integerSubject
+            .send(completion: .finished)
+        
+        integerSubject
+            .send(9)
+        
+        integerSubject
+            .send(19)
+
+        integerSubject
+            .send(completion: .finished)
+        
+        XCTAssertNotEqual(fullfillments.count, fullfillCount)
+    }
+
+    // CurrentValueSubject test: cancel
+    func test_8() {
+        // Given
+        let integerSubject = CurrentValueSubject<Int, Never>(0)
+        var fullfillments = Set<Int>()
+        let fullfillCount = 5
+        
+        cancellable = integerSubject
+            .sink(receiveCompletion: { completion in
+            }, receiveValue: { output in
+                fullfillments.insert(output)
+            })
+        
+        // When
+        integerSubject
+            .send(3)
+        
+        integerSubject
+            .send(5)
+        
+        cancellable?.cancel()
+        
+        integerSubject
+            .send(9)
+        
+        integerSubject
+            .send(19)
+
+        integerSubject
+            .send(completion: .finished)
+        
+        XCTAssertNotEqual(fullfillments.count, fullfillCount)
+    }
+    
+    // PassThroughSubject test: send, completion, cancel
+    func test_9() {
+        // Given
+        var integerSubject = PassThroughSubject<Int, Never>()
+        var fullfillments = Set<Int>()
+        let fullfillCount = 5
+        
+        cancellable = integerSubject
+            .sink(receiveCompletion: { completion in
+            }, receiveValue: { output in
+                print(output)
+            })
+        
+        // When
+        integerSubject
+            .send(3)
+        
+        integerSubject
+            .send(5)
+        
+        cancellable?.cancel()
+        
+        cancellable = integerSubject
+            .sink(receiveCompletion: { completion in
+            }, receiveValue: { output in
+                print(output)
+            })
+        
+        integerSubject
+            .send(9)
+        
+        integerSubject
+            .send(19)
+
+        integerSubject
+            .send(completion: .finished)
+        
+        integerSubject
+            .send(40)
+
+        XCTAssertNotEqual(fullfillments.count, fullfillCount)
     }
 }
