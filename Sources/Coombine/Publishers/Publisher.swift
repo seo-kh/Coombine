@@ -70,4 +70,8 @@ extension Publisher {
         
         return .init(subscriber)
     }
+    
+    func eraseToAnyPublisher() -> AnyPublisher<Self.Output, Self.Failure> {
+        .init(self)
+    }
 }

@@ -285,4 +285,27 @@ final class CoombineTests: XCTestCase {
         
         XCTAssertEqual(myObject.anInt, 1)
     }
+    
+    func test_12() {
+        class TypeWithSubject {
+            let publisher: some Publisher = PassThroughSubject<Int,Never>()
+        }
+        class TypeWithErasedSubject {
+            let publisher: some Publisher = PassThroughSubject<Int,Never>()
+                .eraseToAnyPublisher()
+        }
+
+
+        // In another module:
+        let nonErased = TypeWithSubject()
+        if let subject = nonErased.publisher as? PassThroughSubject<Int,Never> {
+            print("Successfully cast nonErased.publisher.")
+        }
+        let erased = TypeWithErasedSubject()
+        if let subject = erased.publisher as? PassThroughSubject<Int,Never> {
+            print("Successfully cast erased.publisher.")
+        } else if let subject = erased.publisher as? AnyPublisher<Int, Never> {
+            print("Successfully cast erased.publisher.")
+        }
+    }
 }
