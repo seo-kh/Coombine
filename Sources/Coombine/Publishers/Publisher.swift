@@ -78,4 +78,11 @@ extension Publisher {
     func map<T>(_ transform: @escaping (Self.Output) -> T) -> Publishers.Map<Self, T> {
         .init(upstream: self, transform: transform)
     }
+    
+    func print(
+        _ prefix: String = "",
+        to stream: (any TextOutputStream)? = nil
+    ) -> Publishers.Print<Self> {
+        .init(upstream: self, prefix: prefix, stream: stream)
+    }
 }

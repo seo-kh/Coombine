@@ -8,31 +8,37 @@
 import Foundation
 
 enum Publishers {
-    struct _Sequence<Elements, Failure>: Publisher where Elements: Sequence, Failure: Error {
+    struct Sequence<Elements, Failure>: Publisher where Elements: Swift.Sequence, Failure: Error {
         let sequence: Elements
         
         typealias Output = Elements.Element
         
         func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
-            let subscription = _SequenceSubscription()
+            let subscription = SequenceSubscription()
             
             subscriber
                 .receive(subscription: subscription)
             
             for element in sequence {
-                _ = subscriber.receive(element)
+                if subscription.demand == .none { return }
+                
+                let newDemand = subscriber.receive(element)
+                subscription.demand += newDemand
+                subscription.demand -= .max(1)
             }
             
             subscriber.receive(completion: .finished)
         }
         
-        private class _SequenceSubscription: Subscription {
+        private class SequenceSubscription: Subscription {
+            var demand: Subscribers.Demand = .none
+            
             func request(_ demand: Subscribers.Demand) {
-                
+                self.demand = demand
             }
             
             func cancel() {
-                
+                self.demand = .none
             }
         }
     }
@@ -77,10 +83,59 @@ enum Publishers {
             }
         }
     }
+    
+    struct Print<Upstream>: Publisher where Upstream: Publisher {
+        typealias Output = Upstream.Output
+        typealias Failure = Upstream.Failure
+        
+        let upstream: Upstream
+        let prefix: String
+        let stream: (any TextOutputStream)?
+        
+        init(upstream: Upstream, prefix: String, stream: (any TextOutputStream)? = nil) {
+            self.upstream = upstream
+            self.prefix = prefix
+            self.stream = stream
+        }
+        
+        func receive<S>(subscriber: S) where S : Subscriber, Upstream.Failure == S.Failure, Upstream.Output == S.Input {
+            Swift.print("receive subscription:", type(of: upstream))
+            
+            let subscription = PrintSubscription()
+            
+            subscriber
+                .receive(subscription: subscription)
+            
+            let cancel = self.upstream
+                .sink { completion in
+                    Swift.print("receive", completion)
+                    subscriber.receive(completion: completion)
+                } receiveValue: { output in
+                    Swift.print("receive value:", output)
+                    let newDemand = subscriber.receive(output)
+                    if newDemand != .none { Swift.print("receive max:", newDemand.description) }
+                }
+            
+            subscription.upstreamCancel = cancel.cancel
+        }
+        
+        final class PrintSubscription: Subscription {
+            var upstreamCancel: (() -> Void)?
+            
+            func request(_ demand: Subscribers.Demand) {
+                Swift.print("request", demand)
+            }
+            
+            func cancel() {
+                Swift.print("request cancel")
+                upstreamCancel?()
+            }
+        }
+    }
 }
 
 extension Sequence {
-    var publisher: Publishers._Sequence<Self, Never> {
+    var publisher: Publishers.Sequence<Self, Never> {
         .init(sequence: self)
     }
 }

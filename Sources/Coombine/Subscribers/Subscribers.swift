@@ -15,8 +15,11 @@ enum Subscribers {
         }
         
         var description: String {
-            let maxString = (max != nil) ? "unlimited" : "\(max!)"
-            return "Demand(\(maxString)"
+            if let max {
+                return max == 0 ? "" : "max (\(max.description))"
+            } else {
+                return "unlimited"
+            }
         }
         
         /// The number of requested values.
@@ -73,7 +76,7 @@ enum Subscribers {
         @discardableResult
         func receive(_ input: Input) -> Subscribers.Demand {
             self.receiveValue(input)
-            return .unlimited
+            return .none
         }
     }
     
@@ -100,11 +103,12 @@ enum Subscribers {
         
         func receive(subscription: any Subscription) {
             self.subscription = subscription
+            subscription.request(.unlimited)
         }
         
         func receive(_ input: Input) -> Subscribers.Demand {
             object?[keyPath: keyPath] = input
-            return .unlimited
+            return .none
         }
         
         typealias Failure = Never
