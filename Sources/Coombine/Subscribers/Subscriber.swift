@@ -8,7 +8,7 @@
 import Foundation
 
 /// A protocol that declares a type that can receive input from a publisher.
-protocol Subscriber<Input, Failure>: CustomCoombineIdentifierConvertible {
+protocol _Subscriber<Input, Failure>: _CustomCombineIdentifierConvertible {
     /// The kind of values this subscriber receives.
     associatedtype Input
     
@@ -16,18 +16,18 @@ protocol Subscriber<Input, Failure>: CustomCoombineIdentifierConvertible {
     associatedtype Failure: Error
     
     /// Tells the subscriber that the publisher has produced an element.
-    func receive(_ input: Self.Input) -> Subscribers.Demand
+    func receive(_ input: Self.Input) -> Subscribers._Demand
     
     /// Tells the subscriber that it has successfully subscribed to the publisher and may request items.
-    func receive(subscription: Subscription)
+    func receive(subscription: _Subscription)
     
     /// Tells the subscriber that the publisher has completed publishing, either normally or with an error.
-    func receive(completion: Subscribers.Completion<Self.Failure>)
+    func receive(completion: Subscribers._Completion<Self.Failure>)
 }
 
-extension Subscriber {
+extension _Subscriber {
     /// Tells the subsriber that a publisher of void elements if ready to receive futher requests.
-    func receive() -> Subscribers.Demand where Input == () {
+    func receive() -> Subscribers._Demand where Input == () {
         receive(())
     }
 }

@@ -8,12 +8,12 @@
 import Foundation
 
 enum Publishers {
-    struct Sequence<Elements, Failure>: Publisher where Elements: Swift.Sequence, Failure: Error {
+    struct _Sequence<Elements, Failure>: _Publisher where Elements: Swift.Sequence, Failure: Error {
         let sequence: Elements
         
         typealias Output = Elements.Element
         
-        func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
+        func receive<S>(subscriber: S) where S : _Subscriber, Failure == S.Failure, Output == S.Input {
             let subscription = SequenceSubscription()
             
             subscriber
@@ -30,10 +30,10 @@ enum Publishers {
             subscriber.receive(completion: .finished)
         }
         
-        private class SequenceSubscription: Subscription {
-            var demand: Subscribers.Demand = .none
+        private class SequenceSubscription: _Subscription {
+            var demand: Subscribers._Demand = .none
             
-            func request(_ demand: Subscribers.Demand) {
+            func request(_ demand: Subscribers._Demand) {
                 self.demand = demand
             }
             
@@ -43,7 +43,8 @@ enum Publishers {
         }
     }
     
-    struct Map<Upstream, Output>: Publisher where Upstream: Publisher {
+    struct _Map<Upstream, Output>: _Publisher where Upstream: _Publisher {
+        
         typealias Failure = Upstream.Failure
         let upstream: Upstream
         let transform: (Upstream.Output) -> Output
@@ -53,7 +54,7 @@ enum Publishers {
             self.transform = transform
         }
         
-        func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
+        func receive<S>(subscriber: S) where S : _Subscriber, Failure == S.Failure, Output == S.Input {
             let cancellable = self.upstream
                 .sink { completion in
                     subscriber.receive(completion: completion)
@@ -65,14 +66,14 @@ enum Publishers {
             subscriber.receive(subscription: subscription)
         }
         
-        final class MapSubsription: Subscription {
-            var canncelable: Cancellable?
+        final class MapSubsription: _Subscription {
+            var canncelable: _Cancellable?
             
-            init(_ canncelable: Cancellable? = nil) {
+            init(_ canncelable: _Cancellable? = nil) {
                 self.canncelable = canncelable
             }
             
-            func request(_ demand: Subscribers.Demand) {
+            func request(_ demand: Subscribers._Demand) {
                 
             }
             
@@ -84,7 +85,7 @@ enum Publishers {
         }
     }
     
-    struct Print<Upstream>: Publisher where Upstream: Publisher {
+    struct Print<Upstream>: _Publisher where Upstream: _Publisher {
         typealias Output = Upstream.Output
         typealias Failure = Upstream.Failure
         
@@ -98,7 +99,7 @@ enum Publishers {
             self.stream = stream
         }
         
-        func receive<S>(subscriber: S) where S : Subscriber, Upstream.Failure == S.Failure, Upstream.Output == S.Input {
+        func receive<S>(subscriber: S) where S : _Subscriber, Upstream.Failure == S.Failure, Upstream.Output == S.Input {
             Swift.print("receive subscription:", type(of: upstream))
             
             let subscription = PrintSubscription()
@@ -119,10 +120,10 @@ enum Publishers {
             subscription.upstreamCancel = cancel.cancel
         }
         
-        final class PrintSubscription: Subscription {
+        final class PrintSubscription: _Subscription {
             var upstreamCancel: (() -> Void)?
             
-            func request(_ demand: Subscribers.Demand) {
+            func request(_ demand: Subscribers._Demand) {
                 Swift.print("request", demand)
             }
             
@@ -135,7 +136,7 @@ enum Publishers {
 }
 
 extension Sequence {
-    var publisher: Publishers.Sequence<Self, Never> {
+    var publisher: Publishers._Sequence<Self, Never> {
         .init(sequence: self)
     }
 }

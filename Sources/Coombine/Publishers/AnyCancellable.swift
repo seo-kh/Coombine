@@ -7,10 +7,10 @@
 
 import Foundation
 
-final class AnyCancellable: Cancellable, Equatable, Hashable {
+final class _AnyCancellable: _Cancellable, Equatable, Hashable {
     private var _cancel: (() -> Void)?
     
-    static func == (lhs: AnyCancellable, rhs: AnyCancellable) -> Bool {
+    static func == (lhs: _AnyCancellable, rhs: _AnyCancellable) -> Bool {
         lhs === rhs
     }
     
@@ -23,15 +23,15 @@ final class AnyCancellable: Cancellable, Equatable, Hashable {
         self._cancel = cancel
     }
     
-    init<C>(_ canceller: C) where C: Cancellable {
+    init<C>(_ canceller: C) where C: _Cancellable {
         self._cancel = canceller.cancel
     }
     
-    final func store<C>(in collection: inout C) where C: RangeReplaceableCollection, C.Element == AnyCancellable {
+    final func store<C>(in collection: inout C) where C: RangeReplaceableCollection, C.Element == _AnyCancellable {
         collection.append(self)
     }
     
-    final func store(in set: inout Set<AnyCancellable>) {
+    final func store(in set: inout Set<_AnyCancellable>) {
         set.insert(self)
     }
 

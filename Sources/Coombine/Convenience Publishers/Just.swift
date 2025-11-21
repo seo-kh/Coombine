@@ -12,11 +12,11 @@ import Foundation
 /// You can use a Just publisher to start a chain of publishers. A Just publisher is also useful when replacing a value with Publishers.Catch.
 ///
 /// In contrast with Results.Publisher, a Just publisher can't fail with an error. And unlike Optional.Publisher, a Just publisher always produces a value.
-struct Just<Output>: Publisher {
+struct _Just<Output>: _Publisher {
     typealias Failure = Never
     
     func receive<S>(subscriber: S)
-    where S : Subscriber, Failure == S.Failure, Output == S.Input {
+    where S : _Subscriber, Failure == S.Failure, Output == S.Input {
         // Subscription을 주되, 갱신되지 않도록 처리한다.
         // publisher send the subscription, but it cannot be renewd.
         let subscription = JustSubscription()
@@ -32,8 +32,8 @@ struct Just<Output>: Publisher {
         self.output = output
     }
     
-    private final class JustSubscription: Subscription {
-        func request(_ demand: Subscribers.Demand) {
+    private final class JustSubscription: _Subscription {
+        func request(_ demand: Subscribers._Demand) {
             // no needed
         }
         
@@ -43,6 +43,6 @@ struct Just<Output>: Publisher {
     }
 }
 
-extension Just: Equatable where Output: Equatable {
+extension _Just: Equatable where Output: Equatable {
     
 }

@@ -1,5 +1,5 @@
 //
-//  CoombineIdentifier.swift
+//  CombineIdentifier.swift
 //  Coombine
 //
 //  Created by 서광현 on 10/5/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CoombineIdentifier: CustomStringConvertible, Equatable, Hashable {
+struct _CombineIdentifier: CustomStringConvertible, Equatable, Hashable {
     
     init() {
     }
