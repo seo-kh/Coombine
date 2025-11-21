@@ -7,18 +7,34 @@
 
 import Foundation
 
+private var __identifier: UInt64 = 0
+
+internal func __nextCombineIdentifier() -> UInt64 {
+    defer { __identifier += 1 }
+    return __identifier
+}
+
+/// A unique identifier for identifying publisher streams.
+///
+/// To conform to `CustomCombineIdentifierConvertible` in a
+/// `Subscription` or `Subject` that you implement as a structure, create an instance of
+/// `CombineIdentifier` as follows:
+///
+///     let combineIdentifier = CombineIdentifier()
+///
+/// idea from: [openCombine github]( https://github.com/OpenCombine/OpenCombine/blob/master/Sources/OpenCombine/CombineIdentifier.swift)
 struct _CombineIdentifier: CustomStringConvertible, Equatable, Hashable {
+    private let rawValue: UInt64
     
     init() {
+        rawValue = __nextCombineIdentifier()
     }
     
     init(_ obj: AnyObject) {
-    }
-    
-    func hash(into hasher: inout Hasher) {
+        rawValue = UInt64(UInt(bitPattern: ObjectIdentifier(obj)))
     }
     
     var description: String {
-        hashValue.description
+        return "0x\(String(rawValue, radix: 16))"
     }
 }

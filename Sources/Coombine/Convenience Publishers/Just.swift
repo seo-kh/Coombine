@@ -14,12 +14,10 @@ import Foundation
 /// In contrast with Results.Publisher, a Just publisher can't fail with an error. And unlike Optional.Publisher, a Just publisher always produces a value.
 struct _Just<Output>: _Publisher {
     typealias Failure = Never
-    
-    func receive<S>(subscriber: S)
-    where S : _Subscriber, Failure == S.Failure, Output == S.Input {
-        // Subscription을 주되, 갱신되지 않도록 처리한다.
-        // publisher send the subscription, but it cannot be renewd.
-        let subscription = JustSubscription()
+    private let subscription = JustSubscription()
+
+    func receive<S>(subscriber: S) where S : _Subscriber, Failure == S.Failure, Output == S.Input {
+        // 동일한 subscriber에게는 subscription을 주되, 바로 finished나 cancel을 주어야한다.
         subscriber.receive(subscription: subscription)
         _ = subscriber.receive(output)
         subscriber.receive(completion: .finished)
@@ -33,6 +31,8 @@ struct _Just<Output>: _Publisher {
     }
     
     private final class JustSubscription: _Subscription {
+        var identifiers: Set<_CombineIdentifier> = []
+        
         func request(_ demand: _Subscribers._Demand) {
             // no needed
         }
@@ -44,5 +44,7 @@ struct _Just<Output>: _Publisher {
 }
 
 extension _Just: Equatable where Output: Equatable {
-    
+    static func == (lhs: _Just<Output>, rhs: _Just<Output>) -> Bool {
+        lhs.output == rhs.output
+    }
 }
