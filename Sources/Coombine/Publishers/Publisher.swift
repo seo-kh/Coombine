@@ -10,7 +10,7 @@ import Foundation
 /// Declares that a type can transmit a sequence of values over time.
 ///
 /// A publisher delivers elements to one or more `Subscriber` instances.
-protocol _Publisher<Output, Failure> {
+public protocol _Publisher<Output, Failure> {
     /// The kind of values published by this publisher.
     associatedtype Output
     
@@ -21,7 +21,7 @@ protocol _Publisher<Output, Failure> {
     func receive<S>(subscriber: S) where S: _Subscriber, Self.Output == S.Input, Self.Failure == S.Failure
 }
 
-extension _Publisher {
+public extension _Publisher {
     // TODO: func subscribe(_), func subscribe(_) -> AnyCancellable
     func subscribe<S>(_ subscriber: S) where S: _Subscriber, Self.Output == S.Input, Self.Failure == S.Failure {
         self

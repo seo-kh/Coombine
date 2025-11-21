@@ -10,7 +10,7 @@ import Foundation
 /// 요소(Element)를 발행하기 위해 외부 호출자에게 메소드를 제공하는 발행자(Publisher)
 ///
 /// Subject는
-protocol _Subject<Output, Failure>: AnyObject, _Publisher {
+public protocol _Subject<Output, Failure>: AnyObject, _Publisher {
     
     /// subscriber에게 값을 전송
     /// - Parameter value: 전송할 값
@@ -26,7 +26,7 @@ protocol _Subject<Output, Failure>: AnyObject, _Publisher {
     func send(completion: _Subscribers._Completion<Self.Failure>)
 }
 
-extension _Subject {
+public extension _Subject {
     /// subscriber에게 void 값 전송
     func send() where Output == Void {
         self.send(())

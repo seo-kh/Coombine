@@ -7,22 +7,22 @@
 
 import Foundation
 
-final class _PassThroughSubject<Output, Failure>: _Subject where Failure: Error {
+public final class _PassThroughSubject<Output, Failure>: _Subject where Failure: Error {
     
     init() {}
     
     private var subscriber: (any _Subscriber<Output, Failure>)?
     
-    final func send(completion: _Subscribers._Completion<Failure>) {
+    final public func send(completion: _Subscribers._Completion<Failure>) {
         self.subscriber?.receive(completion: completion)
         self.subscriber = nil
     }
     
-    final func send(subscription: any _Subscription) {
+    final public func send(subscription: any _Subscription) {
         self.subscriber?.receive(subscription: subscription)
     }
     
-    func receive<S>(subscriber: S) where S : _Subscriber, Failure == S.Failure, Output == S.Input {
+    public func receive<S>(subscriber: S) where S : _Subscriber, Failure == S.Failure, Output == S.Input {
         let subscription = PassThroughSubjectSubsription(cancel: {
             [weak self] in
             self?.subscriber = nil
@@ -31,7 +31,7 @@ final class _PassThroughSubject<Output, Failure>: _Subject where Failure: Error 
         self.subscriber = subscriber
     }
     
-    final func send(_ value: Output) {
+    final public func send(_ value: Output) {
         _ = self.subscriber?.receive(value)
     }
     

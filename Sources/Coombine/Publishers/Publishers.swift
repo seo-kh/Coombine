@@ -7,13 +7,13 @@
 
 import Foundation
 
-enum _Publishers {
-    struct _Sequence<Elements, Failure>: _Publisher where Elements: Swift.Sequence, Failure: Error {
+public enum _Publishers {
+    public struct _Sequence<Elements, Failure>: _Publisher where Elements: Swift.Sequence, Failure: Error {
         let sequence: Elements
         
-        typealias Output = Elements.Element
+        public typealias Output = Elements.Element
         
-        func receive<S>(subscriber: S) where S : _Subscriber, Failure == S.Failure, Output == S.Input {
+        public func receive<S>(subscriber: S) where S : _Subscriber, Failure == S.Failure, Output == S.Input {
             let subscription = SequenceSubscription()
             
             subscriber
@@ -43,9 +43,9 @@ enum _Publishers {
         }
     }
     
-    struct _Map<Upstream, Output>: _Publisher where Upstream: _Publisher {
+    public struct _Map<Upstream, Output>: _Publisher where Upstream: _Publisher {
         
-        typealias Failure = Upstream.Failure
+        public typealias Failure = Upstream.Failure
         let upstream: Upstream
         let transform: (Upstream.Output) -> Output
         
@@ -54,7 +54,7 @@ enum _Publishers {
             self.transform = transform
         }
         
-        func receive<S>(subscriber: S) where S : _Subscriber, Failure == S.Failure, Output == S.Input {
+        public func receive<S>(subscriber: S) where S : _Subscriber, Failure == S.Failure, Output == S.Input {
             let cancellable = self.upstream
                 .sink { completion in
                     subscriber.receive(completion: completion)
@@ -85,9 +85,9 @@ enum _Publishers {
         }
     }
     
-    struct _Print<Upstream>: _Publisher where Upstream: _Publisher {
-        typealias Output = Upstream.Output
-        typealias Failure = Upstream.Failure
+    public struct _Print<Upstream>: _Publisher where Upstream: _Publisher {
+        public typealias Output = Upstream.Output
+        public typealias Failure = Upstream.Failure
         
         let upstream: Upstream
         let prefix: String
@@ -99,8 +99,8 @@ enum _Publishers {
             self.stream = stream
         }
         
-        func receive<S>(subscriber: S) where S : _Subscriber, Upstream.Failure == S.Failure, Upstream.Output == S.Input {
-            Swift.print("receive subscription:", type(of: upstream))
+        public func receive<S>(subscriber: S) where S : _Subscriber, Upstream.Failure == S.Failure, Upstream.Output == S.Input {
+            Swift.print("receive subscription:", upstream)
             
             let subscription = PrintSubscription()
             
@@ -135,7 +135,7 @@ enum _Publishers {
     }
 }
 
-extension Sequence {
+public extension Sequence {
     var publisher: _Publishers._Sequence<Self, Never> {
         .init(sequence: self)
     }

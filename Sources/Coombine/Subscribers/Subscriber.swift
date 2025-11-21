@@ -8,7 +8,7 @@
 import Foundation
 
 /// A protocol that declares a type that can receive input from a publisher.
-protocol _Subscriber<Input, Failure>: _CustomCombineIdentifierConvertible {
+public protocol _Subscriber<Input, Failure>: _CustomCombineIdentifierConvertible {
     /// The kind of values this subscriber receives.
     associatedtype Input
     

@@ -8,12 +8,12 @@
 import Foundation
 
 /// A protocol for uniquely identifying publisher streams.
-protocol _CustomCombineIdentifierConvertible {
+public protocol _CustomCombineIdentifierConvertible {
     /// A unique identifier for identifying publisher streams.
     var combineIdentifier: _CombineIdentifier { get }
 }
 
-extension _CustomCombineIdentifierConvertible where Self: AnyObject {
+public extension _CustomCombineIdentifierConvertible where Self: AnyObject {
     /// Default implementation
     var combineIdentifier: _CombineIdentifier {
         .init(self)

@@ -7,14 +7,14 @@
 
 import Foundation
 
-enum _Subscribers {
+public enum _Subscribers {
     /// A requetsted number of items, sent to a publisher from a  subscriber through the subscription.
-    struct _Demand: Hashable, Codable, Equatable, Comparable, Sendable, CustomStringConvertible {
-        static func < (lhs: _Subscribers._Demand, rhs: _Subscribers._Demand) -> Bool {
+    public struct _Demand: Hashable, Codable, Equatable, Comparable, Sendable, CustomStringConvertible {
+        public static func < (lhs: _Subscribers._Demand, rhs: _Subscribers._Demand) -> Bool {
             lhs.max ?? 0 < rhs.max ?? 0
         }
         
-        var description: String {
+        public var description: String {
             if let max {
                 return max == 0 ? "" : "max (\(max.description))"
             } else {
@@ -40,14 +40,14 @@ enum _Subscribers {
     }
     
     /// A signal that a publisher doesn't produce additional elements, either due to normal completion or an error.
-    enum _Completion<Failure> where Failure: Error {
+    public enum _Completion<Failure> where Failure: Error {
         case finished
         case failure(Failure)
     }
     
     /// A simple subscriber that requests an unlimited number of values upon subscription.
-    final class _Sink<Input, Failure>: _Subscriber, _Cancellable where Failure: Error {
-        func cancel() {
+    public final class _Sink<Input, Failure>: _Subscriber, _Cancellable where Failure: Error {
+        public func cancel() {
             self.subscription?.cancel()
             self.subscription = nil
         }
@@ -64,23 +64,23 @@ enum _Subscribers {
             self.receiveCompletion = receiveCompletion
         }
         
-        func receive(completion: _Subscribers._Completion<Failure>) {
+        public func receive(completion: _Subscribers._Completion<Failure>) {
             self.receiveCompletion(completion)
         }
         
-        func receive(subscription: any _Subscription) {
+        public func receive(subscription: any _Subscription) {
             self.subscription = subscription
             subscription.request(.unlimited)
         }
         
         @discardableResult
-        func receive(_ input: Input) -> _Subscribers._Demand {
+        public func receive(_ input: Input) -> _Subscribers._Demand {
             self.receiveValue(input)
             return .none
         }
     }
     
-    final class _Assign<Root, Input>: _Subscriber, _Cancellable {
+    public final class _Assign<Root, Input>: _Subscriber, _Cancellable {
         final private(set) var object: Root?
         final let keyPath: ReferenceWritableKeyPath<Root, Input>
         final private var subscription: _Subscription?
@@ -90,27 +90,27 @@ enum _Subscribers {
             self.keyPath = keyPath
         }
         
-        func cancel() {
+        public func cancel() {
             self.subscription?.cancel()
             self.subscription = nil
             self.object = nil
         }
         
-        func receive(completion: _Subscribers._Completion<Never>) {
+        public func receive(completion: _Subscribers._Completion<Never>) {
             self.object = nil
             self.subscription = nil
         }
         
-        func receive(subscription: any _Subscription) {
+        public func receive(subscription: any _Subscription) {
             self.subscription = subscription
             subscription.request(.unlimited)
         }
         
-        func receive(_ input: Input) -> _Subscribers._Demand {
+        public func receive(_ input: Input) -> _Subscribers._Demand {
             object?[keyPath: keyPath] = input
             return .none
         }
         
-        typealias Failure = Never
+        public typealias Failure = Never
     }
 }

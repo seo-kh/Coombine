@@ -23,7 +23,7 @@ internal func __nextCombineIdentifier() -> UInt64 {
 ///     let combineIdentifier = CombineIdentifier()
 ///
 /// idea from: [openCombine github]( https://github.com/OpenCombine/OpenCombine/blob/master/Sources/OpenCombine/CombineIdentifier.swift)
-struct _CombineIdentifier: CustomStringConvertible, Equatable, Hashable {
+public struct _CombineIdentifier: CustomStringConvertible, Equatable, Hashable {
     private let rawValue: UInt64
     
     init() {
@@ -34,7 +34,7 @@ struct _CombineIdentifier: CustomStringConvertible, Equatable, Hashable {
         rawValue = UInt64(UInt(bitPattern: ObjectIdentifier(obj)))
     }
     
-    var description: String {
+    public var description: String {
         return "0x\(String(rawValue, radix: 16))"
     }
 }

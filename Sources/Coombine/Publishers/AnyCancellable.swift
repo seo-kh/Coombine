@@ -7,14 +7,14 @@
 
 import Foundation
 
-final class _AnyCancellable: _Cancellable, Equatable, Hashable {
+public final class _AnyCancellable: _Cancellable, Equatable, Hashable {
     private var _cancel: (() -> Void)?
     
-    static func == (lhs: _AnyCancellable, rhs: _AnyCancellable) -> Bool {
+    public static func == (lhs: _AnyCancellable, rhs: _AnyCancellable) -> Bool {
         lhs === rhs
     }
     
-    func cancel() {
+    public func cancel() {
         _cancel?()
         _cancel = nil
     }
@@ -35,7 +35,7 @@ final class _AnyCancellable: _Cancellable, Equatable, Hashable {
         set.insert(self)
     }
 
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(self)
     }
 }

@@ -8,11 +8,11 @@
 import Foundation
 
 /// A protocol indicating that an activity or action supports cancellation.
-protocol _Cancellable {
+public protocol _Cancellable {
     /// Cancel the activity.
     func cancel()
 }
 
-extension _Cancellable {
+public extension _Cancellable {
     // TODO: func store<C>(in:), func store(in:)
 }
