@@ -18,7 +18,7 @@ final class _CurrentValueSubject<Output, Failure>: _Subject where Failure: Error
         self.value = value
     }
     
-    func send(completion: Subscribers._Completion<Failure>) {
+    func send(completion: _Subscribers._Completion<Failure>) {
         self.subscriber?.receive(completion: completion)
         self.subscriber = nil
     }
@@ -49,7 +49,7 @@ final class _CurrentValueSubject<Output, Failure>: _Subject where Failure: Error
         }
         
         // Never Demand
-        func request(_ demand: Subscribers._Demand) {}
+        func request(_ demand: _Subscribers._Demand) {}
         
         func cancel() {
             self._cancel()

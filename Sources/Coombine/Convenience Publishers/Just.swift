@@ -33,7 +33,7 @@ struct _Just<Output>: _Publisher {
     }
     
     private final class JustSubscription: _Subscription {
-        func request(_ demand: Subscribers._Demand) {
+        func request(_ demand: _Subscribers._Demand) {
             // no needed
         }
         

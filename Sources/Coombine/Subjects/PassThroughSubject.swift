@@ -13,7 +13,7 @@ final class _PassThroughSubject<Output, Failure>: _Subject where Failure: Error 
     
     private var subscriber: (any _Subscriber<Output, Failure>)?
     
-    final func send(completion: Subscribers._Completion<Failure>) {
+    final func send(completion: _Subscribers._Completion<Failure>) {
         self.subscriber?.receive(completion: completion)
         self.subscriber = nil
     }
@@ -46,7 +46,7 @@ final class _PassThroughSubject<Output, Failure>: _Subject where Failure: Error 
             self._cancel()
         }
         
-        func request(_ demand: Subscribers._Demand) {
+        func request(_ demand: _Subscribers._Demand) {
             
         }
     }

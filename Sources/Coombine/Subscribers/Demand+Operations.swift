@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Subscribers._Demand {
+extension _Subscribers._Demand {
     static func * (lhs: Self, rhs: Int) -> Self {
         guard let lhsMax = lhs.max else {
             return .unlimited

@@ -1,5 +1,5 @@
 //
-//  Subscribers.swift
+//  _Subscribers.swift
 //  Coombine
 //
 //  Created by 서광현 on 10/4/24.
@@ -7,10 +7,10 @@
 
 import Foundation
 
-enum Subscribers {
+enum _Subscribers {
     /// A requetsted number of items, sent to a publisher from a  subscriber through the subscription.
     struct _Demand: Hashable, Codable, Equatable, Comparable, Sendable, CustomStringConvertible {
-        static func < (lhs: Subscribers._Demand, rhs: Subscribers._Demand) -> Bool {
+        static func < (lhs: _Subscribers._Demand, rhs: _Subscribers._Demand) -> Bool {
             lhs.max ?? 0 < rhs.max ?? 0
         }
         
@@ -53,18 +53,18 @@ enum Subscribers {
         }
         
         private(set) var receiveValue: (Input) -> Void
-        private(set) var receiveCompletion: (Subscribers._Completion<Failure>) -> Void
+        private(set) var receiveCompletion: (_Subscribers._Completion<Failure>) -> Void
         private var subscription: _Subscription?
         
         init(
-            receiveValue: @escaping (Input) -> Void,
-            receiveCompletion: @escaping (Subscribers._Completion<Failure>) -> Void
+            receiveCompletion: @escaping (_Subscribers._Completion<Failure>) -> Void,
+            receiveValue: @escaping (Input) -> Void
         ) {
             self.receiveValue = receiveValue
             self.receiveCompletion = receiveCompletion
         }
         
-        func receive(completion: Subscribers._Completion<Failure>) {
+        func receive(completion: _Subscribers._Completion<Failure>) {
             self.receiveCompletion(completion)
         }
         
@@ -74,7 +74,7 @@ enum Subscribers {
         }
         
         @discardableResult
-        func receive(_ input: Input) -> Subscribers._Demand {
+        func receive(_ input: Input) -> _Subscribers._Demand {
             self.receiveValue(input)
             return .none
         }
@@ -96,7 +96,7 @@ enum Subscribers {
             self.object = nil
         }
         
-        func receive(completion: Subscribers._Completion<Never>) {
+        func receive(completion: _Subscribers._Completion<Never>) {
             self.object = nil
             self.subscription = nil
         }
@@ -106,7 +106,7 @@ enum Subscribers {
             subscription.request(.unlimited)
         }
         
-        func receive(_ input: Input) -> Subscribers._Demand {
+        func receive(_ input: Input) -> _Subscribers._Demand {
             object?[keyPath: keyPath] = input
             return .none
         }

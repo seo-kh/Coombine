@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum Publishers {
+enum _Publishers {
     struct _Sequence<Elements, Failure>: _Publisher where Elements: Swift.Sequence, Failure: Error {
         let sequence: Elements
         
@@ -31,9 +31,9 @@ enum Publishers {
         }
         
         private class SequenceSubscription: _Subscription {
-            var demand: Subscribers._Demand = .none
+            var demand: _Subscribers._Demand = .none
             
-            func request(_ demand: Subscribers._Demand) {
+            func request(_ demand: _Subscribers._Demand) {
                 self.demand = demand
             }
             
@@ -73,7 +73,7 @@ enum Publishers {
                 self.canncelable = canncelable
             }
             
-            func request(_ demand: Subscribers._Demand) {
+            func request(_ demand: _Subscribers._Demand) {
                 
             }
             
@@ -85,7 +85,7 @@ enum Publishers {
         }
     }
     
-    struct Print<Upstream>: _Publisher where Upstream: _Publisher {
+    struct _Print<Upstream>: _Publisher where Upstream: _Publisher {
         typealias Output = Upstream.Output
         typealias Failure = Upstream.Failure
         
@@ -123,7 +123,7 @@ enum Publishers {
         final class PrintSubscription: _Subscription {
             var upstreamCancel: (() -> Void)?
             
-            func request(_ demand: Subscribers._Demand) {
+            func request(_ demand: _Subscribers._Demand) {
                 Swift.print("request", demand)
             }
             
@@ -136,7 +136,7 @@ enum Publishers {
 }
 
 extension Sequence {
-    var publisher: Publishers._Sequence<Self, Never> {
+    var publisher: _Publishers._Sequence<Self, Never> {
         .init(sequence: self)
     }
 }

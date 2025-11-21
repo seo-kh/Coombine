@@ -23,7 +23,7 @@ protocol _Subject<Output, Failure>: AnyObject, _Publisher {
     func send(subscription: any _Subscription)
     
     /// subscriber에게 완료 신호 전송
-    func send(completion: Subscribers._Completion<Self.Failure>)
+    func send(completion: _Subscribers._Completion<Self.Failure>)
 }
 
 extension _Subject {

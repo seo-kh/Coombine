@@ -16,18 +16,18 @@ protocol _Subscriber<Input, Failure>: _CustomCombineIdentifierConvertible {
     associatedtype Failure: Error
     
     /// Tells the subscriber that the publisher has produced an element.
-    func receive(_ input: Self.Input) -> Subscribers._Demand
+    func receive(_ input: Self.Input) -> _Subscribers._Demand
     
     /// Tells the subscriber that it has successfully subscribed to the publisher and may request items.
     func receive(subscription: _Subscription)
     
     /// Tells the subscriber that the publisher has completed publishing, either normally or with an error.
-    func receive(completion: Subscribers._Completion<Self.Failure>)
+    func receive(completion: _Subscribers._Completion<Self.Failure>)
 }
 
 extension _Subscriber {
     /// Tells the subsriber that a publisher of void elements if ready to receive futher requests.
-    func receive() -> Subscribers._Demand where Input == () {
+    func receive() -> _Subscribers._Demand where Input == () {
         receive(())
     }
 }

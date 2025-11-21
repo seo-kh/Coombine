@@ -39,10 +39,10 @@ extension _Publisher {
     }
     
     func sink(
-        receiveCompletion: @escaping ((Subscribers._Completion<Self.Failure>) -> Void),
+        receiveCompletion: @escaping ((_Subscribers._Completion<Self.Failure>) -> Void),
         receiveValue: @escaping ((Self.Output) -> Void)
     ) -> _AnyCancellable {
-        let subscriber = Subscribers._Sink(receiveValue: receiveValue, receiveCompletion: receiveCompletion)
+        let subscriber = _Subscribers._Sink(receiveCompletion: receiveCompletion, receiveValue: receiveValue)
         
         self.receive(subscriber: subscriber)
         
@@ -52,7 +52,7 @@ extension _Publisher {
     func sink(
         receiveValue: @escaping ((Self.Output) -> Void)
     ) -> _AnyCancellable where Self.Failure == Never {
-        let subscriber = Subscribers._Sink<Self.Output, Self.Failure>(receiveValue: receiveValue, receiveCompletion: { _ in })
+        let subscriber = _Subscribers._Sink<Self.Output, Self.Failure>(receiveCompletion: { _ in }, receiveValue: receiveValue)
         
         self.receive(subscriber: subscriber)
         
@@ -63,7 +63,7 @@ extension _Publisher {
         to keyPath: ReferenceWritableKeyPath<Root, Self.Output>,
         on object: Root
     ) -> _AnyCancellable where Failure == Never {
-        let subscriber = Subscribers._Assign(object: object, keyPath: keyPath)
+        let subscriber = _Subscribers._Assign(object: object, keyPath: keyPath)
         
         self
             .receive(subscriber: subscriber)
@@ -75,14 +75,14 @@ extension _Publisher {
         .init(self)
     }
     
-    func map<T>(_ transform: @escaping (Self.Output) -> T) -> Publishers._Map<Self, T> {
+    func map<T>(_ transform: @escaping (Self.Output) -> T) -> _Publishers._Map<Self, T> {
         .init(upstream: self, transform: transform)
     }
     
     func print(
         _ prefix: String = "",
         to stream: (any TextOutputStream)? = nil
-    ) -> Publishers.Print<Self> {
+    ) -> _Publishers._Print<Self> {
         .init(upstream: self, prefix: prefix, stream: stream)
     }
 }
